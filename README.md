@@ -1,4 +1,10 @@
-# real-state-warehouse-management
+# Real Estate Data Warehouse
+
+<div align='center'>
+<a href="https://github.com/EnriqManComp/real-estate-data-warehouse/blob/master/real-estate-data-warehouse.png">
+  <img src="https://github.com/EnriqManComp/real-estate-data-warehouse/blob/master/real-estate-data-warehouse.png" alt="Real Estate Data Warehouse" height='300' width='700'/>
+</a> 
+</div>
 
 ## Problem Statement
 The task is to deliver clean and valuable data to the stakeholders (executives and data analysts). To achieve the task, we need the following:
