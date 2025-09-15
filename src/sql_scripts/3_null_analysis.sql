@@ -33,5 +33,8 @@ where date_recorded is null;
 DELETE FROM high_roles.stage_table
 WHERE address IS NULL;
 
+DELETE FROM high_roles.stage_table
+WHERE town IS NULL;
+
 
 
