@@ -1,6 +1,7 @@
 
 --- Null values analysis
 
+-- Count of null records by field
 select
 	count(*) filter (where serial_number is null) as null_serial_number,
 	count(*) filter (where list_year is null) as null_list_year,
@@ -19,7 +20,7 @@ select
 	count(*) filter (where location is null) as null_location
 from high_roles.stage_table;
 
---- 2 date_recorded missing
+--- drop date_recorded missing values
 select
 	*
 from high_roles.stage_table
@@ -35,6 +36,7 @@ WHERE address IS NULL;
 
 DELETE FROM high_roles.stage_table
 WHERE town IS NULL;
+
 
 
 

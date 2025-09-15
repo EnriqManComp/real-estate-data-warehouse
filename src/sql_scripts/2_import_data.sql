@@ -1,13 +1,15 @@
 --- Import data
-create temp table tmp_import as 
+
+--- Create temporary table
+create temp table if not exists tmp_import as 
 select *
 from high_roles.raw_table
 with no data;
 
 alter table tmp_import
-drop column record_id;
+drop column if exists record_id;
 
-
+--- Import data from csv file
 copy tmp_import
 from 'D:/Enrique/Portfolio/real-state-warehouse-management/data/Real_Estate_Sales_2001-2023_GL_20250901.csv'
 with (
@@ -20,6 +22,7 @@ select *
 from tmp_import
 limit 5;
 
+--- insert into raw table
 insert into high_roles.raw_table (
 	serial_number,
 	list_year,
@@ -57,6 +60,7 @@ select *
 from high_roles.raw_table
 limit 5;
 
+--- insert into stage table
 insert into high_roles.stage_table (
 	serial_number,
 	list_year,
@@ -89,3 +93,4 @@ select
 	opm_remarks,
 	location
 from tmp_import;
+

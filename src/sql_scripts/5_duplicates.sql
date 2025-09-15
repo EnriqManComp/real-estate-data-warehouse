@@ -1,6 +1,7 @@
 --- duplicates analysis
 
--- Remove duplicates if the record was taking the same date, for the same serial_number, and the same property. There are a lot of these pattern in the data without change
+-- Remove duplicates if the record was taking the same date, for the same serial_number, and the same property.
+-- There are a lot of these pattern in the data without changes
 
 WITH duplicates AS (
     SELECT
@@ -15,6 +16,8 @@ DELETE FROM high_roles.stage_table
 WHERE ctid IN (
     SELECT ctid FROM duplicates WHERE rn > 1
 );
+
+---- This is for verification porpose
 
 WITH inner_st AS (
 	SELECT
@@ -42,9 +45,12 @@ FROM high_roles.stage_table
 WHERE serial_number = 20053
 AND address = '101 STRAWBERRY ST';
 
---- There are updates in different dates of the same property
+-----------
+
+--- There are many updates in different dates of the same property
 --- So, I'm going to add a new boolean field is_last_update
 --- This field track the updates over properties over time.
+--- Also, I'm going to add is_last_representative, tracking the last owner.
 
 --- Adding the two tracking flags
 
@@ -85,6 +91,7 @@ WHERE st.ctid = r.ctid;
 
 SELECT * 
 FROM high_roles.stage_table;
+
 
 
 

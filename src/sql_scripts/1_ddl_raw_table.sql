@@ -39,3 +39,4 @@ create table if not exists high_roles.stage_table (
 	opm_remarks text,
 	location text
 );
+

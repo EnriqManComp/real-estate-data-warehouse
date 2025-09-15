@@ -1,4 +1,6 @@
 --- create agent_dim
+
+--- DDL for agent_dim 
 CREATE TABLE IF NOT EXISTS high_roles.agent_dim (
 	serial_number BIGINT PRIMARY KEY
 );
@@ -13,7 +15,8 @@ SELECT *
 FROM high_roles.agent_dim
 LIMIT 5;
 
---- adding name
+--- Adding additional data for agent_dim (future use)
+--- adding name field
 ALTER TABLE high_roles.agent_dim 
 ADD COLUMN name TEXT DEFAULT NULL;
 
@@ -28,3 +31,4 @@ ADD COLUMN type_realtor TEXT DEFAULT NULL;
 SELECT *
 FROM high_roles.agent_dim
 LIMIT 5;
+
