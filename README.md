@@ -5,4 +5,8 @@ The task is to deliver clean and valuable data to the stakeholders (executives a
 - Set up a star schema from the raw data.
 - Clean the data (formatting and removing duplicates)
 - Set valuable criteria from the raw data to form a new representation, like SCD type 1 or 2.
-- Drive the data through an ETL process using Airflow, Kafka, and Flink.
+- Drive the data through an ETL process using Airflow.
+
+## Install
+
+1- run docker-compose yaml file to start Airflow

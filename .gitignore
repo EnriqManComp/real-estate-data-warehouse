@@ -1,1 +1,6 @@
 data/
+venv/
+config/
+logs/
+plugins/
+
