@@ -7,7 +7,7 @@ WITH duplicates AS (
     SELECT
         ctid,
         ROW_NUMBER() OVER (
-            PARTITION BY daterecorded, serialnumber, town, address
+            PARTITION BY date_recorded, serial_number, town, address
             ORDER BY ctid
         ) AS rn
     FROM high_roles.stage_table
@@ -37,7 +37,7 @@ WITH ranked AS (
         ctid,
         ROW_NUMBER() OVER (
             PARTITION BY town, address
-            ORDER BY daterecorded DESC
+            ORDER BY date_recorded DESC
         ) AS rn
     FROM high_roles.stage_table
 )
@@ -52,7 +52,7 @@ WITH ranked AS (
         ctid,
         ROW_NUMBER() OVER (
             PARTITION BY town, address
-            ORDER BY daterecorded DESC
+            ORDER BY date_recorded DESC
         ) AS rn
     FROM high_roles.stage_table
 )
