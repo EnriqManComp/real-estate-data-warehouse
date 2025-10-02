@@ -7,8 +7,11 @@ from airflow.exceptions import AirflowSkipException
 from airflow.operators.python import PythonOperator
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from sqlalchemy import create_engine
+from python_script.daily.update_sales_dim import update_sales_dim
+from python_script.daily.insert_sales_dim import insert_sales_dim
+from python_script.daily.update_same_day import update_same_day
 
-conn_ip = "172.18.0.3"
+conn_ip = "172.18.0.5"
 
 def fetch_data_api(**context):
 
@@ -86,6 +89,13 @@ fetch_stage_task = PythonOperator(
     dag=dag,
 )
 
+add_property_id_task = SQLExecuteQueryOperator(
+    task_id='add_property_id',
+    conn_id='real_estate_connection',
+    sql='sql_scripts/preprocessing/2_add_property_id.sql',
+    dag=dag,
+)
+
 # Handling null values 
 null_handler_task = SQLExecuteQueryOperator(
     task_id='null_process',
@@ -136,13 +146,35 @@ agent_property_dim_task = SQLExecuteQueryOperator(
     dag=dag,
 )
 
-sales_dim_task = SQLExecuteQueryOperator(
-    task_id='sales_dim',
-    conn_id='real_estate_connection',
-    sql='sql_scripts/daily_sql/10_sales_dim.sql',
+update_sales_dim_task = PythonOperator(
+    task_id='update_sales_dim',
+    python_callable=update_sales_dim,
+    op_args=[
+        create_engine(f"postgresql://airflow:airflow@{conn_ip}:5432/real_estate_database"),
+        "{{ ds }}"
+    ],
     dag=dag,
 )
 
-fetch_stage_task >> null_handler_task >> formatting_task >> duplicates_handler_task >> property_dim_task >> agent_dim_task >> fact_table_task >> agent_property_dim_task >> sales_dim_task
+update_same_day_task = PythonOperator(
+    task_id='update_same_day',
+    python_callable=update_same_day,
+    op_args=[
+        create_engine(f"postgresql://airflow:airflow@{conn_ip}:5432/real_estate_database"),
+        "{{ ds }}"
+    ],
+    dag=dag,
+)
+
+insert_sales_dim_task = PythonOperator(
+    task_id='insert_sales_dim',
+    python_callable=insert_sales_dim,
+    op_args=[
+        create_engine(f"postgresql://airflow:airflow@{conn_ip}:5432/real_estate_database")
+    ],
+    dag=dag,
+)
+
+fetch_stage_task >> add_property_id_task >> null_handler_task >> formatting_task >> duplicates_handler_task >> property_dim_task >> agent_dim_task >> fact_table_task >> agent_property_dim_task >> update_sales_dim_task >> insert_sales_dim_task >> update_same_day_task
 
 

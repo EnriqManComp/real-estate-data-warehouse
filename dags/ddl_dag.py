@@ -3,7 +3,7 @@ from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from datetime import datetime
 
 
-conn_ip = "172.18.0.3"
+conn_ip = "172.18.0.5"
 
 dag = DAG(
     dag_id='ddl_dag',

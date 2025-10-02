@@ -11,7 +11,7 @@ INSERT INTO high_roles.property_dim (
 	location
 	)
 SELECT 
-	DISTINCT ('x' || substr(md5(town || address),1,16))::BIT(64)::BIGINT AS property_id, --- create an unique identifier for each property
+	DISTINCT property_id, --- create an unique identifier for each property
 	town,
 	address,
 	property_type,

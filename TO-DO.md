@@ -11,7 +11,8 @@ TASKS:
 - [x] One-time run dag > fetch_data_api on 2018/7/5.
 - [x] Design daily run dag.
 - [ ] Create the following test cases:
-    - [ ] Check one day insert
+    - [ ] Check API get +1000 data.
+    - [ ] Check one day insert.
     - [ ] Check different records insert.
     - [ ] Check duplicates records in the same date
     - [ ] Check updates in scd type 1, when same id has been inserted.
