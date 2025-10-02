@@ -19,6 +19,8 @@ TASKS:
     - [ ] Check tracking in scd type 2, when a new update has been required.
     - [ ] Check expected length over different runs.
 - [ ] Run for two year interval 2018-07-05 to 2020-07-05. 
+- [ ] Design the DE dashboard.
+- [ ] Get COVID data and integrate.
 - [ ] Migrate SQL code to Spark in sales dimension to remove bottleneck.
 - [ ] Design the executive & analytic & computing cost dashboard.
 - [ ] Run for the remain time interval to current day.

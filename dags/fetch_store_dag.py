@@ -4,6 +4,7 @@ import pandas as pd
 import requests
 from io import StringIO
 from airflow.exceptions import AirflowSkipException
+from airflow.hooks.base import BaseHook
 from airflow.operators.python import PythonOperator
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from sqlalchemy import create_engine
@@ -11,7 +12,8 @@ from python_script.daily.update_sales_dim import update_sales_dim
 from python_script.daily.insert_sales_dim import insert_sales_dim
 from python_script.daily.update_same_day import update_same_day
 
-conn_ip = "172.18.0.5"
+conn = BaseHook.get_connection("real_estate_connection")
+db_engine = create_engine(f"postgresql://{conn.login}:{conn.password}@{conn.host}:{conn.port}/{conn.schema}")
 
 def fetch_data_api(**context):
 
@@ -60,9 +62,9 @@ def fetch_data_api(**context):
 
     # Push raw data into Postgres staging table
     if not daily_data.empty:
-        engine = create_engine(f"postgresql://airflow:airflow@{conn_ip}:5432/real_estate_database")
+
         daily_data.columns=field_names
-        daily_data.to_sql("stage_table", engine, if_exists='replace', index=False, schema="high_roles")
+        daily_data.to_sql("stage_table", db_engine, if_exists='replace', index=False, schema="high_roles")
     else:
         raise AirflowSkipException("No data found, skipping downstream tasks.")
 
@@ -80,6 +82,7 @@ dag = DAG(
     description='DAG to fetch real estate data from gov api and store it in Postres db',
     schedule=timedelta(days=1),
     catchup=False,
+    template_searchpath=['/opt/airflow/src']
 )
 
 # fetch data from api
@@ -150,7 +153,7 @@ update_sales_dim_task = PythonOperator(
     task_id='update_sales_dim',
     python_callable=update_sales_dim,
     op_args=[
-        create_engine(f"postgresql://airflow:airflow@{conn_ip}:5432/real_estate_database"),
+        db_engine,
         "{{ ds }}"
     ],
     dag=dag,
@@ -160,7 +163,7 @@ update_same_day_task = PythonOperator(
     task_id='update_same_day',
     python_callable=update_same_day,
     op_args=[
-        create_engine(f"postgresql://airflow:airflow@{conn_ip}:5432/real_estate_database"),
+        db_engine,
         "{{ ds }}"
     ],
     dag=dag,
@@ -170,7 +173,7 @@ insert_sales_dim_task = PythonOperator(
     task_id='insert_sales_dim',
     python_callable=insert_sales_dim,
     op_args=[
-        create_engine(f"postgresql://airflow:airflow@{conn_ip}:5432/real_estate_database")
+        db_engine
     ],
     dag=dag,
 )

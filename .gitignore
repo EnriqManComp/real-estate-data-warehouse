@@ -3,4 +3,4 @@ venv/
 config/
 logs/
 plugins/
-
+config.yaml
