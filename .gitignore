@@ -4,3 +4,4 @@ config/
 logs/
 plugins/
 config.yaml
+.env

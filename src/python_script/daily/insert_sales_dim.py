@@ -9,17 +9,17 @@ def insert_sales_dim(engine):
                 *
             FROM high_roles.sales_dim
         ),
-        current AS (
-            SELECT
-                serial_number,
-                property_id,
-                date_recorded,
-                assessed_value,
-                sale_amount,
-                sales_ratio
-            FROM high_roles.stage_table
+            current AS (
+                SELECT
+                    serial_number,
+                    property_id,
+                    date_recorded,
+                    assessed_value,
+                    sale_amount,
+                    sales_ratio
+                FROM high_roles.stage_table
         ),
-        combine AS (
+            combine AS (
             SELECT
                 cr.property_id,
                 cr.date_recorded AS initial_date,
@@ -52,20 +52,25 @@ def insert_sales_dim(engine):
                     THEN TRUE ELSE FALSE
                 END AS is_not_ready	
                 FROM current cr
-                LEFT JOIN previous pr
-                    ON cr.property_id = pr.property_id 
+                LEFT JOIN LATERAL (
+                SELECT *
+                FROM previous pr
+                WHERE pr.property_id = cr.property_id
+                ORDER BY pr.initial_date DESC
+                LIMIT 1
+            ) pr ON TRUE
         )
         INSERT INTO high_roles.sales_dim (
-            property_id,
-            initial_date,
-            end_date,
-            serial_number,
-            sales_info,
-            is_change_agency,
-            is_positive_ratio,
-            is_negative_ratio,
-            is_not_ready
-        )
+                    property_id,
+                    initial_date,
+                    end_date,
+                    serial_number,
+                    sales_info,
+                    is_change_agency,
+                    is_positive_ratio,
+                    is_negative_ratio,
+                    is_not_ready
+                )
         SELECT *
         FROM combine;
     """)

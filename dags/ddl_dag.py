@@ -52,5 +52,13 @@ create_sales_dim = SQLExecuteQueryOperator(
     dag=dag,
 )
 
+# Creates the data engineering table logger
+create_de_logger = SQLExecuteQueryOperator(
+    task_id='de_logger_ddl',
+    conn_id='real_estate_connection',
+    sql='11_de_logger.sql',
+    dag=dag,
+)
+
 # dag sequence
-create_property_dim >> create_agent_dim >> create_fact_table >> create_agent_property_dim >> create_sales_dim
+create_property_dim >> create_agent_dim >> create_fact_table >> create_agent_property_dim >> create_sales_dim >> create_de_logger
