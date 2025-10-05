@@ -14,7 +14,7 @@ TASKS:
 - [x] Request runtime execution of each task using flower api
 - [x] Store time consumed in a db.
 - [ ] Run for two year interval 2018-07-05 to 2018-08-05. 
-- [ ] Design the DE dashboard.
+- [x] Design the DE dashboard.
 - [ ] Design the executive & analytic dashboards.
 - [ ] Create the following test cases:
     - [ ] Check API get +1000 data.
