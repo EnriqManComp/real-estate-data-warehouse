@@ -17,3 +17,11 @@ The task is to deliver clean and valuable data to the stakeholders (executives a
 
 ## Data Source
 https://data.ct.gov/Housing-and-Development/Real-Estate-Sales-2001-2023-GL/5mzw-sjtu/about_data
+
+## DE Dashboard
+
+<div align='center'>
+<a href="https://github.com/EnriqManComp/real-estate-data-warehouse/blob/master/viz/de%20dashboard%20design.png">
+  <img src="https://github.com/EnriqManComp/real-estate-data-warehouse/blob/master/viz/de%20dashboard%20design.png" alt="Real Estate Data Warehouse" height='300' width='700'/>
+</a> 
+</div>
