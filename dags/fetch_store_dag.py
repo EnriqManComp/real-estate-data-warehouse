@@ -14,80 +14,20 @@ from python_script.daily.update_sales_dim import update_sales_dim
 from python_script.daily.insert_sales_dim import insert_sales_dim
 from python_script.daily.update_same_day import update_same_day
 from task_runtime_logger import tasks_logger
+from fetch_data import fetch_data_api
 
 # Getting real estate postgres connection info 
-try:
+try: # ✅ Error Handler Airflow-database connection
     # Using BaseHook to get connection object
     conn = BaseHook.get_connection("real_estate_connection")
 except Exception as e:
     print(f"Failed to get Airflow connection: {e}")
 else:
-    try:
+    try: # ✅ Error Handler db engine
         # Creating database engine connected to real estate database from postgres
         db_engine = create_engine(f"postgresql://{conn.login}:{conn.password}@{conn.host}:{conn.port}/{conn.schema}")
     except Exception as e:
         print(f"Failed to create SQLAlchemy engine: {e}")
-
-def fetch_data_api(**context):
-    """ Fetch the data from the gov API, limit set to 1000 records """
-
-    # Getting the logical day from airflow
-    logical_date = context["logical_date"]
-    day = logical_date.strftime("%Y-%m-%dT00:00:00.000")
-
-    # base api url
-    base_url = "https://data.ct.gov/resource/5mzw-sjtu.csv"
-
-    # Normalize field names 
-    field_names = [
-        "serial_number",
-	    "list_year",
-	    "date_recorded",
-	    "town",
-	    "address",
-	    "assessed_value",
-	    "sale_amount",
-	    "sales_ratio",
-	    "property_type",
-	    "residencial_type",
-	    "non_use_code",
-	    "assessor_remarks",
-	    "opm_remarks",
-	    "location"
-    ]
-
-    # Headers for URL
-    params = {
-        'daterecorded': day,
-        '$limit': 1000,
-        '$offset': 0
-    }
-
-    # Creating dataframe for daily data
-    daily_data = pd.DataFrame()
-
-    while True:
-        # Request data from api
-        results = requests.get(base_url, params=params)
-        # Convert to pandas DataFrame
-        results_df = pd.read_csv(StringIO(results.text))
-        # Break the loop in case not data
-        if results_df.empty:
-            break
-        # Concatenate data if limit exceed 1000 records
-        daily_data = pd.concat([daily_data, results_df], axis=0)
-        # Update offset 
-        params['$offset'] += params['$limit']
-
-    # Push raw data into Postgres staging table
-    if not daily_data.empty:
-        # Rename field names
-        daily_data.columns=field_names
-        # Push to postgres
-        daily_data.to_sql("stage_table", db_engine, if_exists='replace', index=False, schema="high_roles")
-    else:
-        # Skip if empty data for the logical date
-        raise AirflowSkipException("No data found, skipping downstream tasks.")
 
 # Default args for the dag
 default_args = {
@@ -112,6 +52,10 @@ dag = DAG(
 fetch_stage_task = PythonOperator(
     task_id="fetch_data_api",
     python_callable=fetch_data_api,
+    op_args=[
+        db_engine,
+        "{{ ds }}"
+    ],
     dag=dag,
 )
 
