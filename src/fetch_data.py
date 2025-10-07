@@ -12,7 +12,7 @@ def fetch_data_api(db_engine, logical_date):
     # base api url
     base_url = "https://data.ct.gov/resource/5mzw-sjtu.csv"
 
-    # Normalize field names 
+    # Normalize field names
     field_names = [
         "serial_number",
 	    "list_year",
@@ -38,27 +38,33 @@ def fetch_data_api(db_engine, logical_date):
     }
 
     # Creating dataframe for daily data
-    daily_data = pd.DataFrame()
+    daily_data = pd.DataFrame() 
 
     while True:
         # Request data from api
         results = requests.get(base_url, params=params)
-        # Convert to pandas DataFrame
-        results_df = pd.read_csv(StringIO(results.text))
-        # Break the loop in case not data
-        if results_df.empty:
+        try:
+            # Convert to pandas DataFrame
+            results_df = pd.read_csv(StringIO(results.text))
+        except pd.errors.EmptyDataError:
             break
+        # Break the loop in case not data
+        if results_df.empty:                # [:test-tag: units_and_components.Empty data test] ✅
+            break   
         # Concatenate data if limit exceed 1000 records
         daily_data = pd.concat([daily_data, results_df], axis=0)
+        #daily_data = daily_data.reset_index(drop=True)
         # Update offset 
-        params['$offset'] += params['$limit']
+        params['$offset'] += params['$limit']   # [:test-tag: units_and_components.Non-empty data test] ✅
 
     # Push raw data into Postgres staging table
     if not daily_data.empty:
         # Rename field names
         daily_data.columns=field_names
         # Push to postgres
-        daily_data.to_sql("stage_table", db_engine, if_exists='replace', index=False, schema="high_roles") # [:test-tag] ✅ Tested
+        daily_data.to_sql("stage_table", db_engine, if_exists='replace', index=False, schema="high_roles") # [:test-tag: units_and_components.Hit db test] ✅ Tested
     else:
         # Skip if empty data for the logical date
-        raise AirflowSkipException("No data found, skipping downstream tasks.") # [:test-tag: Empty data] ✅ Tested
+        raise AirflowSkipException("No data found, skipping downstream tasks.") # [:test-tag: units_and_components.Empty data test] ✅ Tested
+    
+
