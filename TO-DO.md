@@ -14,19 +14,19 @@ TASKS:
 - [x] Request runtime execution of each task using flower api
 - [x] Store time consumed in a db. 
 - [x] Design the DE dashboard.
-- [ ] Create the following test cases:
-    - [ ] Check API get +1000 data.
-    - [ ] Check one day insert.
-    - [ ] Check different records insert.
-    - [ ] Check duplicates records in the same date
-    - [ ] Check updates in scd type 1, when same id has been inserted.
-    - [ ] Check tracking in scd type 2, when a new update has been required.
-    - [ ] Check expected length over different runs.
+- [x] Create the following unit test cases:
+    - [x] Test if the response is empty data.
+    - [x] Test the pagination of the responses from the API.
+    - [x] Test the push to the database.
+    - [x] Test the creation of stage_table.
+- [x] Create the following integration test cases:
+    - [x] Test the column length and renames of the dataset fields.
+    - [x] Test if the response is non-empty that the db is non empty.
 - [ ] Run for two year interval 2018-07-05 to 2018-08-05.
 - [ ] Design the executive & analytic dashboards.
 - [ ] Run for the remain time interval to current day.
 - [ ] Check the final results on dashboards.
 - [ ] Write the summary of the project: technologies used, achievement, use cases in real-world scenario, data modeling approach.
-- [ ] Add to porfolio.
+- [x] Add to porfolio.
 
 

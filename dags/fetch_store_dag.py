@@ -1,7 +1,6 @@
 from airflow import DAG
 from datetime import datetime, timedelta
-import pandas as pd
-import requests
+import logging
 import sys
 sys.path.append("/opt/airflow/src")
 from io import StringIO
@@ -16,18 +15,26 @@ from python_script.daily.update_same_day import update_same_day
 from task_runtime_logger import tasks_logger
 from fetch_data import fetch_data_api
 
+logger = logging.getLogger(__name__)
+
 # Getting real estate postgres connection info 
 try: # ✅ Error Handler Airflow-database connection
     # Using BaseHook to get connection object
     conn = BaseHook.get_connection("real_estate_connection")
+    logger.info("Successfully retrieved Airflow connection: real_estate_connection")
 except Exception as e:
-    print(f"Failed to get Airflow connection: {e}")
-else:
+    logger.error(f"❌ Failed to get Airflow connection: {e}", exc_info=True)
+    conn = None
+
+if conn:
     try: # ✅ Error Handler db engine
-        # Creating database engine connected to real estate database from postgres
-        db_engine = create_engine(f"postgresql://{conn.login}:{conn.password}@{conn.host}:{conn.port}/{conn.schema}")
+        # Creating an engine connected to real estate database from postgres
+        conn_str = f"postgresql://{conn.login}:{conn.password}@{conn.host}:{conn.port}/{conn.schema}"
+        db_engine = create_engine(conn_str)
+        logger.info("✅ Successfully created SQLAlchemy engine for real_estate database")
     except Exception as e:
-        print(f"Failed to create SQLAlchemy engine: {e}")
+        logger.error(f"❌ Failed to create SQLAlchemy engine: {e}", exc_info=True)
+        db_engine = None
 
 # Default args for the dag
 default_args = {
@@ -48,6 +55,7 @@ dag = DAG(
     template_searchpath=['/opt/airflow/src'] # Path template for the code
 )
 
+# [:test-tag: integration_tests.Connection API-database behavior] ✅
 # fetch data from api
 fetch_stage_task = PythonOperator(
     task_id="fetch_data_api",

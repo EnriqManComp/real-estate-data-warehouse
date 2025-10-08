@@ -2,12 +2,16 @@ import pandas as pd
 import requests
 from io import StringIO
 from airflow.exceptions import AirflowSkipException
+from datetime import datetime
 
-def fetch_data_api(db_engine, logical_date):
+def fetch_data_api(db_engine, current_date):
     """ Fetch the data from the gov API, limit set to 1000 records """
 
     # Formatting the logical day
-    day = logical_date.strftime("%Y-%m-%dT00:00:00.000")
+    if isinstance(current_date, str): # Catch if is a string to avoid error on airflow due to Jinja template
+        current_date = datetime.strptime(current_date, '%Y-%m-%d')
+
+    day = current_date.strftime("%Y-%m-%dT00:00:00.000")
 
     # base api url
     base_url = "https://data.ct.gov/resource/5mzw-sjtu.csv"
